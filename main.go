@@ -24,7 +24,7 @@ type ExpenseTracker struct {
 	Amount int `json:"amount"`
 }
 
-func readExpensesFromFile () ([]ExpenseTracker, error) {
+func loadExpenses () ([]ExpenseTracker, error) {
 	jsonData, err := os.ReadFile("expenses.json")
 	if err != nil {
 		log.Fatalf("Error while reading file %v", err)
@@ -45,7 +45,7 @@ func readExpensesFromFile () ([]ExpenseTracker, error) {
 	return expenses, err
 }
 
-func writeExpensesToFile (e []ExpenseTracker) []byte {
+func encodeExpenses (e []ExpenseTracker) []byte {
 	jExpense, err := json.Marshal(e)
 	if err != nil {
 		log.Fatalf("Error while turning code to byte %v", err)
@@ -70,14 +70,14 @@ var listExpenseCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List expenses",
 	Long:  "List expenses to the see all expenses",
-	Run:   listExpenses,
+	Run:   showExpenses,
 }
 
 var summaryExpensesCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "Summary of expenses",
 	Long:  "Summary of expense totals of amount you spent",
-	Run:   summaryExpenses,
+	Run:   showSummary,
 }
 
 var deleteExpenseCmd = &cobra.Command{
@@ -95,7 +95,7 @@ func init() {
 }
 
 func addExpense (cmd *cobra.Command, args []string) {
-	existingExpense, err := readExpensesFromFile()
+	existingExpense, err := loadExpenses()
 	nextID := 1
 
 	for _, t := range existingExpense {
@@ -115,7 +115,7 @@ func addExpense (cmd *cobra.Command, args []string) {
 
 	existingExpense = append(existingExpense, newExpense)
 
-	byteData := writeExpensesToFile(existingExpense)
+	byteData := encodeExpenses(existingExpense)
 
 	err = os.WriteFile("expenses.json", byteData, 0644)
 
@@ -126,8 +126,8 @@ func addExpense (cmd *cobra.Command, args []string) {
 	fmt.Printf("Expense added successfully (ID: %d)", newExpense.ID)
 }
 
-func listExpenses (cmd *cobra.Command, args []string) {
-	existingExpenses, err := readExpensesFromFile()
+func showExpenses (cmd *cobra.Command, args []string) {
+	existingExpenses, err := loadExpenses()
 
 	if err != nil {
 		log.Fatalf("Error while reading existing expenses %v", err)
@@ -139,8 +139,8 @@ func listExpenses (cmd *cobra.Command, args []string) {
 	table.Render()
 }
 
-func summaryExpenses (cmd * cobra.Command, args []string) {
-  existingExpenses, err := readExpensesFromFile()
+func showSummary (cmd * cobra.Command, args []string) {
+  existingExpenses, err := loadExpenses()
 	if err != nil {
 		log.Fatalf("Error while extracting existing expenses, %v", err)
 	}
@@ -154,7 +154,7 @@ func summaryExpenses (cmd * cobra.Command, args []string) {
 }
 
 func deleteExpense (cmd * cobra.Command, args []string) {
-	existingExpenses, err := readExpensesFromFile()
+	existingExpenses, err := loadExpenses()
 	if err != nil {
 		log.Fatalf("Error while reading expenses. %v", err)
 	}
@@ -166,7 +166,7 @@ func deleteExpense (cmd * cobra.Command, args []string) {
 		}
 	}
 	existingExpenses = filtered
-	byteData := writeExpensesToFile(existingExpenses)
+	byteData := encodeExpenses(existingExpenses)
 
 	err = os.WriteFile("expenses.json", byteData, 0644)
 
