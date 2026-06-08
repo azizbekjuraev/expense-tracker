@@ -15,6 +15,7 @@ var (
 	description string
 	amount int
 	id int
+	force bool
 )
 
 const filename = "expenses.json"
@@ -96,14 +97,22 @@ var updateExpenseCmd = &cobra.Command{
 	Run: updateExpense,
 }
 
+var deleteAllExpensesCmd = &cobra.Command{
+	Use: "delete-all",
+	Short: "Delete all expenses",
+	Long: "Delete all expenses",
+	Run: deleteAllExpenses,
+}
+
 func init() {
-	addExpenseCmd.Flags().StringVar(&description, "description", "", "Description of the task")
+	addExpenseCmd.Flags().StringVar(&description, "description", "", "Description of the expense")
 	addExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Amount of the expense")
 	deleteExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to delete expense")
+	deleteAllExpensesCmd.Flags().BoolVarP(&force, "force", "f", false, "Delete all expenses")
 	updateExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to update expense")
-	updateExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Update amount of particular item")
-	updateExpenseCmd.Flags().StringVar(&description, "description", "", "Update description of particular item")
-	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd)
+	updateExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Update amount of particular expenses")
+	updateExpenseCmd.Flags().StringVar(&description, "description", "", "Update description of particular expense")
+	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd, deleteAllExpensesCmd)
 }
 
 func addExpense (cmd *cobra.Command, args []string) {
@@ -189,23 +198,26 @@ func deleteExpense (cmd * cobra.Command, args []string) {
 }
 
 func updateExpense (cmd *cobra.Command, args []string) {
-	fmt.Println(cmd, "cmd")
-	existingExpense, err := loadExpenses()
+	existingExpenses, err := loadExpenses()
 	if err != nil {
 		log.Fatalf("Error while reading expenses. %v", err)
 	}
 
 	now := time.Now()
 
-	for i, e := range existingExpense {
+	for i, e := range existingExpenses {
 		if e.ID == id {
-			existingExpense[i].Amount = amount
-			existingExpense[i].Description = description
-		  existingExpense[i].Date = now.Format("2006-01-02")
+			if amount > 0 {
+				existingExpenses[i].Amount = amount
+			}
+			if description != "" {
+				existingExpenses[i].Description = description
+			}
+		  existingExpenses[i].Date = now.Format("2006-01-02")
 		}
 	}
 
-	byteData := encodeExpenses(existingExpense)
+	byteData := encodeExpenses(existingExpenses)
 
 	err = os.WriteFile(filename, byteData, 0644)
 
@@ -217,6 +229,25 @@ func updateExpense (cmd *cobra.Command, args []string) {
 }
 
 func deleteAllExpenses (cmd *cobra.Command, args []string) {
+	existingExpenses, err := loadExpenses()
+
+	if err != nil {
+		log.Fatalf("Error while reading expenses. %v", err)
+	}
+
+	if force {
+		existingExpenses = existingExpenses[:0]
+	}
+
+	byteData := encodeExpenses(existingExpenses)
+
+	err = os.WriteFile(filename, byteData, 0644)
+
+	if err != nil {
+		log.Fatalf("Error while writing updated data to the file %v", err)
+	}
+
+	fmt.Println("All expenses deleted successfully")
 }
 
 func main () {
