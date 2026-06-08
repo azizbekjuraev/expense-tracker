@@ -17,6 +17,8 @@ var (
 	id int
 )
 
+const filename = "expenses.json"
+
 type ExpenseTracker struct {
 	ID int `json:"id"`
 	Date string `json:"date"`
@@ -25,7 +27,7 @@ type ExpenseTracker struct {
 }
 
 func loadExpenses () ([]ExpenseTracker, error) {
-	jsonData, err := os.ReadFile("expenses.json")
+	jsonData, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("Error while reading file %v", err)
 	}
@@ -87,11 +89,21 @@ var deleteExpenseCmd = &cobra.Command{
 	Run: deleteExpense,
 }
 
+var updateExpenseCmd = &cobra.Command{
+	Use: "update",
+	Short: "Update expense",
+	Long: "Update the expense you want",
+	Run: updateExpense,
+}
+
 func init() {
 	addExpenseCmd.Flags().StringVar(&description, "description", "", "Description of the task")
 	addExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Amount of the expense")
 	deleteExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to delete expense")
-	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd)
+	updateExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to update expense")
+	updateExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Update amount of particular item")
+	updateExpenseCmd.Flags().StringVar(&description, "description", "", "Update description of particular item")
+	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd)
 }
 
 func addExpense (cmd *cobra.Command, args []string) {
@@ -108,7 +120,7 @@ func addExpense (cmd *cobra.Command, args []string) {
 
 	newExpense := ExpenseTracker {
 		ID: nextID,
-		Date: now.Format("2006-01-2"),
+		Date: now.Format("2006-01-02"),
 		Description: description,
 		Amount: amount,
 	}
@@ -117,7 +129,7 @@ func addExpense (cmd *cobra.Command, args []string) {
 
 	byteData := encodeExpenses(existingExpense)
 
-	err = os.WriteFile("expenses.json", byteData, 0644)
+	err = os.WriteFile(filename, byteData, 0644)
 
 	if err != nil {
 		log.Fatalf("Error while writing expenses, %v", err)
@@ -168,12 +180,43 @@ func deleteExpense (cmd * cobra.Command, args []string) {
 	existingExpenses = filtered
 	byteData := encodeExpenses(existingExpenses)
 
-	err = os.WriteFile("expenses.json", byteData, 0644)
+	err = os.WriteFile(filename, byteData, 0644)
 
 	if err != nil {
 		log.Fatalf("Error while writing updated data to the file %v", err)
 	}
 	fmt.Println("Expense deleted successfully")
+}
+
+func updateExpense (cmd *cobra.Command, args []string) {
+	fmt.Println(cmd, "cmd")
+	existingExpense, err := loadExpenses()
+	if err != nil {
+		log.Fatalf("Error while reading expenses. %v", err)
+	}
+
+	now := time.Now()
+
+	for i, e := range existingExpense {
+		if e.ID == id {
+			existingExpense[i].Amount = amount
+			existingExpense[i].Description = description
+		  existingExpense[i].Date = now.Format("2006-01-02")
+		}
+	}
+
+	byteData := encodeExpenses(existingExpense)
+
+	err = os.WriteFile(filename, byteData, 0644)
+
+	if err != nil {
+		log.Fatalf("Error while writing updated data to the file %v", err)
+	}
+
+	fmt.Println("Expense updated successfully")
+}
+
+func deleteAllExpenses (cmd *cobra.Command, args []string) {
 }
 
 func main () {
