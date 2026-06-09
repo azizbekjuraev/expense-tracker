@@ -20,7 +20,6 @@ func LoadExpenses() ([]t.ExpenseTracker, error) {
 	var expenses []t.ExpenseTracker
 
 	err = json.Unmarshal(jsonData, &expenses)
-
 	if err != nil {
 		log.Fatalf("Error while unmarshalling %v", err)
 	}

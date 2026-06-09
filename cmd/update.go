@@ -38,10 +38,12 @@ func updateExpense (cmd *cobra.Command, args []string) {
 		}
 	}
 
-	byteData := u.EncodeExpenses(existingExpenses)
+	byteData, err := u.EncodeExpenses(existingExpenses)
+	if err != nil {
+		log.Fatalf("Error while encoding expenses: %v", err)
+	}
 
 	err = os.WriteFile(filename, byteData, permissionCode)
-
 	if err != nil {
 		log.Fatalf("Error while writing updated data to the file %v", err)
 	}

@@ -2,14 +2,13 @@ package utils
 
 import (
 	"encoding/json"
-	"log"
 	t "expense-tracker/internal/expense/types"
 )
 
-func EncodeExpenses (e []t.ExpenseTracker) []byte {
+func EncodeExpenses (e []t.ExpenseTracker) ([]byte, error) {
 	jExpense, err := json.Marshal(e)
 	if err != nil {
-		log.Fatalf("Error while turning code to byte %v", err)
+		return nil, err
 	}
-	return jExpense
+	return jExpense, nil
 }

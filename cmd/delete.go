@@ -37,13 +37,16 @@ func deleteExpense (cmd * cobra.Command, args []string) {
 		}
 	}
 	existingExpenses = filtered
-	byteData := u.EncodeExpenses(existingExpenses)
+	byteData, err := u.EncodeExpenses(existingExpenses)
+	if err != nil {
+		log.Fatalf("Error while encoding expenses: %v", err)
+	}
 
 	err = os.WriteFile(filename, byteData, permissionCode)
-
 	if err != nil {
 		log.Fatalf("Error while writing updated data to the file %v", err)
 	}
+
 	fmt.Println("Expense deleted successfully")
 }
 
@@ -58,10 +61,12 @@ func deleteAllExpenses (cmd *cobra.Command, args []string) {
 		existingExpenses = existingExpenses[:0]
 	}
 
-	byteData := u.EncodeExpenses(existingExpenses)
+	byteData, err := u.EncodeExpenses(existingExpenses)
+	if err != nil {
+		log.Fatalf("Error while encoding expenses: %v", err)
+	}
 
 	err = os.WriteFile(filename, byteData, permissionCode)
-
 	if err != nil {
 		log.Fatalf("Error while writing updated data to the file %v", err)
 	}

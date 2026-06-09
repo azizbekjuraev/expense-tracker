@@ -40,10 +40,12 @@ func addExpense (cmd *cobra.Command, args []string) {
 
 	existingExpense = append(existingExpense, newExpense)
 
-	byteData := u.EncodeExpenses(existingExpense)
+	byteData, err := u.EncodeExpenses(existingExpense)
+	if err != nil {
+		log.Fatalf("Error while encoding expenses: %v", err)
+	}
 
 	err = os.WriteFile(filename, byteData, permissionCode)
-
 	if err != nil {
 		log.Fatalf("Error while writing expenses, %v", err)
 	}
