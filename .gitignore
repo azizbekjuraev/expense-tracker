@@ -9,6 +9,9 @@ expenses.json
 *.so
 *.dylib
 
+#Personal notes
+IDEAS.md
+
 # Test binaries and coverage
 *.test
 *.out
