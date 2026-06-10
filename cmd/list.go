@@ -22,7 +22,10 @@ func showExpenses (cmd *cobra.Command, args []string) error {
 
 	filtered := existingExpenses[:0]
 	for _, e := range existingExpenses {
-		if (from == "" || e.Date >= from) && (to == "" || e.Date <= to) {
+		if (from == "" || e.Date >= from) &&
+			(to == "" || e.Date <= to) &&
+			(category == "" || category == e.Category) &&
+			(min == 0 || min <= e.Amount) {
 			filtered = append(filtered, e)
 		}
 	}
