@@ -7,9 +7,10 @@ const permissionCode = 0644
 
 var (
 	description string
-	amount int
+	amount float64
 	id int
 	force bool
+	category string
 )
 
 var rootCmd = &cobra.Command {
@@ -19,12 +20,13 @@ var rootCmd = &cobra.Command {
 }
 
 func init() {
+	addExpenseCmd.Flags().StringVar(&category, "category", "", "Category of the expense")
 	addExpenseCmd.Flags().StringVar(&description, "description", "", "Description of the expense")
-	addExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Amount of the expense")
+	addExpenseCmd.Flags().Float64Var(&amount, "amount", 0.0, "Amount of the expense")
 	deleteExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to delete expense")
 	deleteAllExpensesCmd.Flags().BoolVarP(&force, "force", "f", false, "Delete all expenses")
 	updateExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to update expense")
-	updateExpenseCmd.Flags().IntVar(&amount, "amount", 0, "Update amount of particular expenses")
+	updateExpenseCmd.Flags().Float64Var(&amount, "amount", 0.0, "Update amount of particular expenses")
 	updateExpenseCmd.Flags().StringVar(&description, "description", "", "Update description of particular expense")
 	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd, deleteAllExpensesCmd)
 }

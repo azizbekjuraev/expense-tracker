@@ -21,7 +21,7 @@ func showSummary (cmd * cobra.Command, args []string) {
 		log.Fatalf("Error while extracting existing expenses, %v", err)
 	}
 
-	var total = 0
+	var total = 0.0
 
 	for _, e := range existingExpenses {
 		total = total + e.Amount

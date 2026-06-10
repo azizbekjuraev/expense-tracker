@@ -34,6 +34,9 @@ func updateExpense (cmd *cobra.Command, args []string) {
 			if description != "" {
 				existingExpenses[i].Description = description
 			}
+			if category != "" {
+				existingExpenses[i].Category = category
+			}
 		  existingExpenses[i].Date = now.Format("2006-01-02")
 		}
 	}

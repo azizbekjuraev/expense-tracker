@@ -23,7 +23,7 @@ func showExpenses (cmd *cobra.Command, args []string) {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.Header("ID", "Date", "Description", "Amount")
+	table.Header("ID", "Date", "Category", "Description", "Amount")
 	table.Bulk(existingExpenses)
 	table.Render()
 }
