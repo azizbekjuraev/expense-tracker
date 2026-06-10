@@ -11,6 +11,8 @@ var (
 	id int
 	force bool
 	category string
+	from string
+	to string
 )
 
 var rootCmd = &cobra.Command {
@@ -28,6 +30,8 @@ func init() {
 	updateExpenseCmd.Flags().IntVar(&id, "id", 0, "Id to update expense")
 	updateExpenseCmd.Flags().Float64Var(&amount, "amount", 0.0, "Update amount of particular expenses")
 	updateExpenseCmd.Flags().StringVar(&description, "description", "", "Update description of particular expense")
+	listExpenseCmd.Flags().StringVar(&from, "from", "", "Target date from (format: YYYY-MM-DD)")
+	listExpenseCmd.Flags().StringVar(&to, "to", "", "Target date to (format: YYYY-MM-DD)")
 	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd, deleteAllExpensesCmd)
 }
 
