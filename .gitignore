@@ -3,6 +3,7 @@
 
 # Runtime data
 expenses.json
+budget.json
 *.exe
 *.exe~
 *.dll

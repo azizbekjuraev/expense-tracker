@@ -14,6 +14,7 @@ var (
 	from string
 	to string
 	min float64
+	monthly float64
 )
 
 var rootCmd = &cobra.Command {
@@ -34,8 +35,9 @@ func init() {
 	listExpenseCmd.Flags().StringVar(&from, "from", "", "Target date from (format: YYYY-MM-DD)")
 	listExpenseCmd.Flags().StringVar(&to, "to", "", "Target date to (format: YYYY-MM-DD)")
 	listExpenseCmd.Flags().StringVar(&category, "category", "", "Filter by category")
+	setBudgetCmd.Flags().Float64Var(&monthly, "monthly", 0.0, "Set your bugdet")
 	listExpenseCmd.Flags().Float64Var(&min, "min", 0.0, "Filter by minimum amount")
-	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd, deleteAllExpensesCmd)
+	rootCmd.AddCommand(addExpenseCmd, listExpenseCmd, deleteExpenseCmd, summaryExpensesCmd, updateExpenseCmd, deleteAllExpensesCmd, setBudgetCmd)
 }
 
 func Execute() error {

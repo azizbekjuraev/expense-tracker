@@ -35,11 +35,27 @@ func addExpense (cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	existingBudget, err := s.LoadBudget()
+	if err != nil {
+		return err
+	}
+
+	var total = 0.0
+	for _, e := range existingExpense {
+		total = total + e.Amount
+	}
+
+	totalWithNewExpense := total + amount
+
+	if totalWithNewExpense > existingBudget.Monthly {
+		return fmt.Errorf("you have exceeded your monthly limit of %f", existingBudget.Monthly)
+	}
+
 	nextID := 1
 
-	for _, t := range existingExpense {
-		if t.ID >= nextID {
-			nextID = t.ID + 1
+	for _, e := range existingExpense {
+		if e.ID >= nextID {
+			nextID = e.ID + 1
 		}
 	}
 
